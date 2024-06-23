@@ -54,7 +54,9 @@ class Nunil_Capture_CSP_Violations extends Nunil_Capture {
 			1 === $options['connect-src_enabled'] ||
 			1 === $options['manifest-src_enabled'] ||
 			1 === $options['form-action_enabled'] ||
-			1 === $options['img-src_enabled']
+			1 === $options['img-src_enabled'] ||
+			1 === $options['script-src_enabled'] ||
+			1 === $options['style-src_enabled']
 			) {
 				$csp_violation = $this->get_csp_report_body( $report );
 
@@ -111,6 +113,9 @@ class Nunil_Capture_CSP_Violations extends Nunil_Capture {
 						array(
 							'script-src',
 							'style-src',
+							'script-src-elem',
+							'style-src-attr',
+							'style-src-elem',
 						),
 						true
 					) ) {
@@ -146,6 +151,41 @@ class Nunil_Capture_CSP_Violations extends Nunil_Capture {
 									$partial
 								)
 							);
+
+							$sample = '';
+							if ( isset( $csp_violation['sample'] ) ) {
+								$sample = $csp_violation['sample'];
+							}
+							if ( isset( $csp_violation['script-sample'] ) ) {
+								$sample = $csp_violation['script-sample'];
+							}
+							$sample_len = strlen( $sample );
+
+							// Solo se il sample è completo.
+							if ( $sample_len > 0 && $sample_len < 40 ) {
+								switch ( $violated_directive ) {
+									case 'style-src-attr':
+										$vdm = 'style-src';
+										break;
+									case 'style-src-elem':
+										$vdm = 'style-src';
+										break;
+									case 'script-src-elem':
+										$vdm = 'script-src';
+										break;
+									default:
+										$vdm = $violated_directive;
+								}
+								if ( 'script-src-attr' !== $vdm ) {
+									$capture->insert_inline_content_in_db(
+										$vdm,
+										'v-capt',
+										$sample,
+										false,
+										strval( $document_uri )
+									);
+								} // else this is an event handler
+							}
 						}
 						if ( 'eval' === $blocked_url || 'empty' === $blocked_url ) {
 							$capture->insert_external_tag_in_db(
