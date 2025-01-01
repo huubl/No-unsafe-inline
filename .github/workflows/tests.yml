@@ -69,6 +69,9 @@ jobs:
       env:
         fail-fast: true
 
+    - name: Install Subversion
+      run: sudo apt-get install subversion
+
     - name: Setup Wordpress over phpunit
       run: bash bin/install-wp-tests.sh wordpress root password 127.0.0.1:${{ job.services.mysql.ports[3306] }} ${{ matrix.wordpress-version }} true
 
