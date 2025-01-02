@@ -36,17 +36,17 @@ class Nunil_Capture_CSP_Violations extends Nunil_Capture {
 	 * @return CSPReportUri|non-empty-list<CSPReportTo>
 	 */
 	private function get_response_body( $request ) {
-		$rawResponse = array();
+		$raw_response = array();
 		try {
-			$rawResponse = json_decode( $request->get_body(), true, 512, JSON_THROW_ON_ERROR );
+			$raw_response = json_decode( $request->get_body(), true, 512, JSON_THROW_ON_ERROR );
 		} catch ( \JsonException $e ) {
 			throw new Nunil_Exception( esc_html__( 'json could not be decoded: ', 'no-unsafe-inline' ) . $e->getMessage(), 3005, 3 );
 		}
-		if ( ! is_array( $rawResponse ) ) {
+		if ( ! is_array( $raw_response ) ) {
 			throw new Nunil_Exception( esc_html__( 'no json in REST response', 'no-unsafe-inline' ), 3006, 3 );
 		}
-		/** @var CSPReportUri|non-empty-list<CSPReportTo> $rawResponse */
-		return $rawResponse;
+		/** @var CSPReportUri|non-empty-list<CSPReportTo> $raw_response */
+		return $raw_response;
 	}
 
 	/**
@@ -55,6 +55,7 @@ class Nunil_Capture_CSP_Violations extends Nunil_Capture {
 	 * @since 1.0.0
 	 * @access public
 	 * @template T of array
+	 * @throws Nunil_Exception If $reports is not a valid JSON Object.
 	 * @param \WP_REST_Request<T> $request The rest api request.
 	 * @return \WP_REST_Response|void
 	 */
